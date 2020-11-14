@@ -5,10 +5,12 @@
 // THE SOURCE CODE IS AVAILABLE UNDER THE ABOVE CHOSEN LICENSE "AS IS", WITH NO WARRANTIES.
 
 extern crate num_traits;
+extern crate serde;
+
+use serde::{Deserialize, Serialize};
 
 /// Vector in 3 dimensions.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Ord, PartialOrd)]
-#[cfg_attr(feature = "serde-serde", derive(Serialize, Deserialize))]
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct Vector3<F: num_traits::Float = f64> {
     pub x: F,
     pub y: F,
@@ -28,6 +30,36 @@ impl<F: num_traits::Float> Vector3<F> {
     /// Creates a new vector with the specified coordinates.
     pub fn new(x: F, y: F, z: F) -> Self {
         Self { x, y, z }
+    }
+
+    /// Returns a new vector with a copy of coordinate `x`
+    /// and the others set to `0`.
+    pub fn x(&self) -> Self {
+        Self {
+            x: self.x,
+            y: num_traits::zero(),
+            z: num_traits::zero(),
+        }
+    }
+
+    /// Returns a new vector with a copy of coordinate `y`
+    /// and the others set to `0`.
+    pub fn y(&self) -> Self {
+        Self {
+            x: num_traits::zero(),
+            y: self.y,
+            z: num_traits::zero(),
+        }
+    }
+
+    /// Returns a new vector with a copy of coordinate `z`
+    /// and the others set to `0`.
+    pub fn z(&self) -> Self {
+        Self {
+            x: num_traits::zero(),
+            y: num_traits::zero(),
+            z: self.z,
+        }
     }
 
     /// Flips the sign of all the coordinates of the vector.
@@ -57,10 +89,53 @@ impl<F: num_traits::Float> Vector3<F> {
     pub fn normalize(&mut self) -> &mut Self {
         let length = self.magnitude();
         if length > num_traits::zero() {
-            self.x = self.x / length;
-            self.y = self.y / length;
-            self.z = self.z / length;
+            self.scalar_div(length);
         }
+        self
+    }
+
+    /// Scalar addition of the vector.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn scalar_add(&mut self, scalar: F) -> &mut Self {
+        self.x = self.x + scalar;
+        self.y = self.y + scalar;
+        self.z = self.z + scalar;
+        self
+    }
+
+    /// Scalar substraction of the vector.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn scalar_sub(&mut self, scalar: F) -> &mut Self {
+        self.scalar_add(-scalar)
+    }
+
+    /// Scalar multiplication of the vector.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn scalar_mul(&mut self, scalar: F) -> &mut Self {
+        self.x = self.x * scalar;
+        self.y = self.y * scalar;
+        self.z = self.z * scalar;
+        self
+    }
+
+    /// Scalar division of the vector.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn scalar_div(&mut self, scalar: F) -> &mut Self {
+        self.x = self.x / scalar;
+        self.y = self.y / scalar;
+        self.z = self.z / scalar;
         self
     }
 }

@@ -9,13 +9,13 @@ extern crate num_traits;
 /// Vector in 3 dimensions.
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Ord, PartialOrd)]
 #[cfg_attr(feature = "serde-serde", derive(Serialize, Deserialize))]
-pub struct Vector3<R: num_traits::Float = f64> {
-    pub x: R,
-    pub y: R,
-    pub z: R,
+pub struct Vector3<F: num_traits::Float = f64> {
+    pub x: F,
+    pub y: F,
+    pub z: F,
 }
 
-impl<R: num_traits::Float> Vector3<R> {
+impl<F: num_traits::Float> Vector3<F> {
     /// Creates a vector with all its coordinates at origin (0, 0, 0).
     pub fn origin() -> Self {
         Self {
@@ -26,7 +26,7 @@ impl<R: num_traits::Float> Vector3<R> {
     }
 
     /// Creates a new vector with the specified coordinates.
-    pub fn new(x: R, y: R, z: R) -> Self {
+    pub fn new(x: F, y: F, z: F) -> Self {
         Self { x, y, z }
     }
 
@@ -44,12 +44,12 @@ impl<R: num_traits::Float> Vector3<R> {
 
     /// Returns the magnitude of the vector.
     /// Magnitude represents the length of the vector.
-    pub fn magnitude(&self) -> R {
+    pub fn magnitude(&self) -> F {
         (self.squared_magnitude()).sqrt()
     }
 
     /// Returns the squared magnitude of the vector.
-    pub fn squared_magnitude(&self) -> R {
+    pub fn squared_magnitude(&self) -> F {
         (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
     }
 

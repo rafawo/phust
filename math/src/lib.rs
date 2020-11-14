@@ -4,24 +4,24 @@
 // except according to those terms.
 // THE SOURCE CODE IS AVAILABLE UNDER THE ABOVE CHOSEN LICENSE "AS IS", WITH NO WARRANTIES.
 
-extern crate num_traits as num;
+extern crate num_traits;
 
 /// Vector in 3 dimensions.
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, Ord, PartialOrd)]
 #[cfg_attr(feature = "serde-serde", derive(Serialize, Deserialize))]
-pub struct Vector3<R: num::real::Real = f64> {
+pub struct Vector3<R: num_traits::Float = f64> {
     pub x: R,
     pub y: R,
     pub z: R,
 }
 
-impl<R: num::real::Real> Vector3<R> {
+impl<R: num_traits::Float> Vector3<R> {
     /// Creates a vector with all its coordinates at origin (0, 0, 0).
     pub fn origin() -> Self {
         Self {
-            x: num::Zero::zero(),
-            y: num::Zero::zero(),
-            z: num::Zero::zero(),
+            x: num_traits::zero(),
+            y: num_traits::zero(),
+            z: num_traits::zero(),
         }
     }
 
@@ -39,6 +39,28 @@ impl<R: num::real::Real> Vector3<R> {
         self.x = -self.x;
         self.y = -self.y;
         self.z = -self.z;
+        self
+    }
+
+    /// Returns the magnitude of the vector.
+    /// Magnitude represents the length of the vector.
+    pub fn magnitude(&self) -> R {
+        (self.squared_magnitude()).sqrt()
+    }
+
+    /// Returns the squared magnitude of the vector.
+    pub fn squared_magnitude(&self) -> R {
+        (self.x * self.x) + (self.y * self.y) + (self.z * self.z)
+    }
+
+    /// Transforms a non-zero vector into a vector of unit length.
+    pub fn normalize(&mut self) -> &mut Self {
+        let length = self.magnitude();
+        if length > num_traits::zero() {
+            self.x = self.x / length;
+            self.y = self.y / length;
+            self.z = self.z / length;
+        }
         self
     }
 }

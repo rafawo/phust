@@ -264,8 +264,8 @@ impl<F: num_traits::Float> Vector3<F> {
         self
     }
 
-    /// Calculates the dot product of two vectors,
-    /// aka Scalar Product, Inner Product.
+    /// Calculates the dot product of two vectors, aka Scalar Product, Inner Product.
+    /// The returned scalar calculates the magnitude of one vector in the direction of another.
     pub fn dot_product(&self, other: &Vector3<F>) -> F {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
     }

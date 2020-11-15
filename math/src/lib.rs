@@ -188,10 +188,10 @@ impl<F: num_traits::Float> Vector3<F> {
     }
 }
 
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 macro_rules! impl_vec3_operator {
-    ($trait:ident, $fn_name:ident, $scalar_method:ident, $vector_method:ident) => {
+    ($trait:ident, $trait_assign:ident, $fn_name:ident, $fn_name_assign:ident, $scalar_method:ident, $vector_method:ident) => {
         impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<F> for &Vector3<F> {
             type Output = Vector3<F>;
             fn $fn_name(self, other: F) -> Vector3<F> {
@@ -205,6 +205,18 @@ macro_rules! impl_vec3_operator {
             fn $fn_name(self, other: F) -> Vector3<F> {
                 let mut copy = self;
                 *copy.$scalar_method(other)
+            }
+        }
+
+        impl<F: $trait_assign + num_traits::Float + Copy> $trait_assign<F> for &mut Vector3<F> {
+            fn $fn_name_assign(&mut self, other: F) {
+                self.$scalar_method(other);
+            }
+        }
+
+        impl<F: $trait_assign + num_traits::Float + Copy> $trait_assign<F> for Vector3<F> {
+            fn $fn_name_assign(&mut self, other: F) {
+                self.$scalar_method(other);
             }
         }
 
@@ -226,10 +238,10 @@ macro_rules! impl_vec3_operator {
     };
 }
 
-impl_vec3_operator!(Add, add, scalar_add, vector_add);
-impl_vec3_operator!(Sub, sub, scalar_sub, vector_sub);
-impl_vec3_operator!(Mul, mul, scalar_mul, vector_mul);
-impl_vec3_operator!(Div, div, scalar_div, vector_div);
+impl_vec3_operator!(Add, AddAssign, add, add_assign, scalar_add, vector_add);
+impl_vec3_operator!(Sub, SubAssign, sub, sub_assign, scalar_sub, vector_sub);
+impl_vec3_operator!(Mul, MulAssign, mul, mul_assign, scalar_mul, vector_mul);
+impl_vec3_operator!(Div, DivAssign, div, div_assign, scalar_div, vector_div);
 
 #[cfg(test)]
 mod vector3_test {
@@ -301,6 +313,8 @@ mod vector3_test {
     #[test]
     fn scalar_operations() {
         let mut vec3 = Vector3::<f64>::new(1.5, 1.5, 1.5);
+
+        // Addition
         assert_eq!(
             Vector3 {
                 x: 3.0,
@@ -315,15 +329,26 @@ mod vector3_test {
                 y: 4.5,
                 z: 4.5
             },
-            vec3 + 1.5_f64
+            vec3 + 1.5
         );
+        vec3 += 0.5;
+        assert_eq!(
+            Vector3 {
+                x: 3.5,
+                y: 3.5,
+                z: 3.5
+            },
+            vec3
+        );
+
+        // Substraction
         assert_eq!(
             Vector3 {
                 x: 1.5,
                 y: 1.5,
                 z: 1.5
             },
-            *vec3.scalar_sub(1.5)
+            *vec3.scalar_sub(2.0)
         );
         assert_eq!(
             Vector3 {
@@ -333,29 +358,51 @@ mod vector3_test {
             },
             vec3 - 1.0
         );
+        vec3 -= 2.5;
         assert_eq!(
             Vector3 {
-                x: 3.0,
-                y: 3.0,
-                z: 3.0
+                x: -1.0,
+                y: -1.0,
+                z: -1.0
             },
-            *vec3.scalar_mul(2.0)
+            vec3
         );
+
+        // Multiplication
+        assert_eq!(
+            Vector3 {
+                x: -3.0,
+                y: -3.0,
+                z: -3.0
+            },
+            *vec3.scalar_mul(3.0)
+        );
+        assert_eq!(
+            Vector3 {
+                x: -6.0,
+                y: -6.0,
+                z: -6.0
+            },
+            vec3 * 2.0
+        );
+        vec3 *= -2.0;
         assert_eq!(
             Vector3 {
                 x: 6.0,
                 y: 6.0,
                 z: 6.0
             },
-            vec3 * 2.0
+            vec3
         );
+
+        // Division
         assert_eq!(
             Vector3 {
                 x: 1.0,
                 y: 1.0,
                 z: 1.0
             },
-            *vec3.scalar_div(3.0)
+            *vec3.scalar_div(6.0)
         );
         assert_eq!(
             Vector3 {
@@ -364,6 +411,15 @@ mod vector3_test {
                 z: 0.5
             },
             vec3 / 2.0
+        );
+        vec3 /= 2.0;
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            vec3
         );
     }
 

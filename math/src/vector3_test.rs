@@ -47,7 +47,7 @@ fn general_usage() {
             y: -2.0,
             z: -3.0
         },
-        *vec3.invert()
+        *vec3.inplace_invert()
     );
     assert_eq!(
         Vector3 {
@@ -55,7 +55,7 @@ fn general_usage() {
             y: 2.0,
             z: 3.0
         },
-        *vec3.invert()
+        *vec3.inplace_invert()
     );
     assert_eq!(14.0, vec3.squared_magnitude());
     assert_eq!(4.0, vec3.magnitude().ceil());
@@ -65,7 +65,7 @@ fn general_usage() {
             y: 0.5345224838248488,
             z: 0.8017837257372732
         },
-        *vec3.normalize()
+        *vec3.inplace_normalize()
     );
 }
 
@@ -80,7 +80,7 @@ fn scalar_operations() {
             y: 3.0,
             z: 3.0
         },
-        *vec3.scalar_add(1.5)
+        *vec3.inplace_scalar_add(1.5)
     );
     assert_eq!(
         Vector3 {
@@ -115,7 +115,7 @@ fn scalar_operations() {
             y: 1.5,
             z: 1.5
         },
-        *vec3.scalar_sub(2.0)
+        *vec3.inplace_scalar_sub(2.0)
     );
     assert_eq!(
         Vector3 {
@@ -150,7 +150,7 @@ fn scalar_operations() {
             y: -3.0,
             z: -3.0
         },
-        *vec3.scalar_mul(3.0)
+        *vec3.inplace_scalar_mul(3.0)
     );
     assert_eq!(
         Vector3 {
@@ -185,7 +185,7 @@ fn scalar_operations() {
             y: 1.0,
             z: 1.0
         },
-        *vec3.scalar_div(6.0)
+        *vec3.inplace_scalar_div(6.0)
     );
     assert_eq!(
         Vector3 {
@@ -224,10 +224,10 @@ fn chaining_operations() {
             z: 1.0
         },
         *vec3
-            .scalar_add(1.5)
-            .scalar_sub(1.5)
-            .scalar_mul(2.0)
-            .scalar_div(3.0)
+            .inplace_scalar_add(1.5)
+            .inplace_scalar_sub(1.5)
+            .inplace_scalar_mul(2.0)
+            .inplace_scalar_div(3.0)
     );
     assert_eq!(
         Vector3 {
@@ -235,7 +235,7 @@ fn chaining_operations() {
             y: -0.5773502691896258,
             z: -0.5773502691896258
         },
-        *vec3.invert().normalize()
+        *vec3.inplace_invert().inplace_normalize()
     );
 }
 

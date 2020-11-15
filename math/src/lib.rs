@@ -189,6 +189,21 @@ impl<F: num_traits::Float> Vector3<F> {
         self.z = self.z / other.z;
         self
     }
+
+    /// Calculates the dot product of two vectors,
+    /// aka Scalar Product, Inner Product.
+    pub fn dot_product(&self, other: &Vector3<F>) -> F {
+        (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
+    }
+
+    /// Calculates the angle in radians between two vectors.
+    pub fn theta(&self, other: &Vector3<F>) -> F {
+        let mut a = *self;
+        a.normalize();
+        let mut b = *other;
+        b.normalize();
+        a.dot_product(&b).acos()
+    }
 }
 
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};

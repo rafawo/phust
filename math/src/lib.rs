@@ -139,3 +139,133 @@ impl<F: num_traits::Float> Vector3<F> {
         self
     }
 }
+
+#[cfg(test)]
+mod vector3_test {
+    use super::*;
+
+    #[test]
+    fn general_usage() {
+        assert_eq!(
+            Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0
+            },
+            Vector3::origin()
+        );
+        let mut vec3 = Vector3::<f64>::new(1.0, 2.0, 3.0);
+        assert_eq!(
+            Vector3 {
+                x: 1.0,
+                y: 0.0,
+                z: 0.0
+            },
+            vec3.x()
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.0,
+                y: 2.0,
+                z: 0.0
+            },
+            vec3.y()
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 3.0
+            },
+            vec3.z()
+        );
+        assert_eq!(
+            Vector3 {
+                x: -1.0,
+                y: -2.0,
+                z: -3.0
+            },
+            *vec3.invert()
+        );
+        assert_eq!(
+            Vector3 {
+                x: 1.0,
+                y: 2.0,
+                z: 3.0
+            },
+            *vec3.invert()
+        );
+        assert_eq!(14.0, vec3.squared_magnitude());
+        assert_eq!(4.0, vec3.magnitude().ceil());
+        assert_eq!(
+            Vector3 {
+                x: 0.2672612419124244,
+                y: 0.5345224838248488,
+                z: 0.8017837257372732
+            },
+            *vec3.normalize()
+        );
+    }
+
+    #[test]
+    fn scalar_operations() {
+        let mut vec3 = Vector3::<f64>::new(1.5, 1.5, 1.5);
+        assert_eq!(
+            Vector3 {
+                x: 3.0,
+                y: 3.0,
+                z: 3.0
+            },
+            *vec3.scalar_add(1.5)
+        );
+        assert_eq!(
+            Vector3 {
+                x: 1.5,
+                y: 1.5,
+                z: 1.5
+            },
+            *vec3.scalar_sub(1.5)
+        );
+        assert_eq!(
+            Vector3 {
+                x: 3.0,
+                y: 3.0,
+                z: 3.0
+            },
+            *vec3.scalar_mul(2.0)
+        );
+        assert_eq!(
+            Vector3 {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0
+            },
+            *vec3.scalar_div(3.0)
+        );
+    }
+
+    #[test]
+    fn chaining_operations() {
+        let mut vec3 = Vector3::<f64>::new(1.5, 1.5, 1.5);
+        assert_eq!(
+            Vector3 {
+                x: 1.0,
+                y: 1.0,
+                z: 1.0
+            },
+            *vec3
+                .scalar_add(1.5)
+                .scalar_sub(1.5)
+                .scalar_mul(2.0)
+                .scalar_div(3.0)
+        );
+        assert_eq!(
+            Vector3 {
+                x: -0.5773502691896258,
+                y: -0.5773502691896258,
+                z: -0.5773502691896258
+            },
+            *vec3.invert().normalize()
+        );
+    }
+}

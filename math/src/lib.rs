@@ -208,12 +208,6 @@ macro_rules! impl_vec3_operator {
             }
         }
 
-        impl<F: $trait_assign + num_traits::Float + Copy> $trait_assign<F> for &mut Vector3<F> {
-            fn $fn_name_assign(&mut self, other: F) {
-                self.$scalar_method(other);
-            }
-        }
-
         impl<F: $trait_assign + num_traits::Float + Copy> $trait_assign<F> for Vector3<F> {
             fn $fn_name_assign(&mut self, other: F) {
                 self.$scalar_method(other);
@@ -228,11 +222,41 @@ macro_rules! impl_vec3_operator {
             }
         }
 
+        impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<Vector3<F>> for &Vector3<F> {
+            type Output = Vector3<F>;
+            fn $fn_name(self, other: Vector3<F>) -> Vector3<F> {
+                let mut copy = *self;
+                *copy.$vector_method(&other)
+            }
+        }
+
         impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<&Vector3<F>> for Vector3<F> {
             type Output = Vector3<F>;
             fn $fn_name(self, other: &Vector3<F>) -> Vector3<F> {
                 let mut copy = self;
                 *copy.$vector_method(other)
+            }
+        }
+
+        impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<Vector3<F>> for Vector3<F> {
+            type Output = Vector3<F>;
+            fn $fn_name(self, other: Vector3<F>) -> Vector3<F> {
+                let mut copy = self;
+                *copy.$vector_method(&other)
+            }
+        }
+
+        impl<F: $trait_assign + num_traits::Float + Copy> $trait_assign<&Vector3<F>>
+            for Vector3<F>
+        {
+            fn $fn_name_assign(&mut self, other: &Vector3<F>) {
+                self.$vector_method(other);
+            }
+        }
+
+        impl<F: $trait_assign + num_traits::Float + Copy> $trait_assign<Vector3<F>> for Vector3<F> {
+            fn $fn_name_assign(&mut self, other: Vector3<F>) {
+                self.$vector_method(&other);
             }
         }
     };
@@ -331,6 +355,14 @@ mod vector3_test {
             },
             vec3 + 1.5
         );
+        assert_eq!(
+            Vector3 {
+                x: 4.5,
+                y: 4.5,
+                z: 4.5
+            },
+            &vec3 + 1.5
+        );
         vec3 += 0.5;
         assert_eq!(
             Vector3 {
@@ -357,6 +389,14 @@ mod vector3_test {
                 z: 0.5
             },
             vec3 - 1.0
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            &vec3 - 1.0
         );
         vec3 -= 2.5;
         assert_eq!(
@@ -385,6 +425,14 @@ mod vector3_test {
             },
             vec3 * 2.0
         );
+        assert_eq!(
+            Vector3 {
+                x: -6.0,
+                y: -6.0,
+                z: -6.0
+            },
+            &vec3 * 2.0
+        );
         vec3 *= -2.0;
         assert_eq!(
             Vector3 {
@@ -411,6 +459,14 @@ mod vector3_test {
                 z: 0.5
             },
             vec3 / 2.0
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            &vec3 / 2.0
         );
         vec3 /= 2.0;
         assert_eq!(
@@ -445,6 +501,167 @@ mod vector3_test {
                 z: -0.5773502691896258
             },
             *vec3.invert().normalize()
+        );
+    }
+
+    #[test]
+    fn vector_operators() {
+        let mut a = Vector3::<f64>::new(1.0, 1.0, 1.0);
+        let b = Vector3::<f64>::new(2.0, 2.0, 2.0);
+
+        // Addition
+        assert_eq!(
+            Vector3 {
+                x: 3.0,
+                y: 3.0,
+                z: 3.0
+            },
+            a + b
+        );
+        assert_eq!(
+            Vector3 {
+                x: 3.0,
+                y: 3.0,
+                z: 3.0
+            },
+            &a + &b
+        );
+        assert_eq!(
+            Vector3 {
+                x: 3.0,
+                y: 3.0,
+                z: 3.0
+            },
+            &a + b
+        );
+        assert_eq!(
+            Vector3 {
+                x: 3.0,
+                y: 3.0,
+                z: 3.0
+            },
+            a + &b
+        );
+        a += b;
+        a += &b;
+        assert_eq!(
+            Vector3 {
+                x: 5.0,
+                y: 5.0,
+                z: 5.0
+            },
+            a
+        );
+        a = Vector3::new(1.0, 1.0, 1.0);
+
+        // Substraction
+        assert_eq!(
+            Vector3 {
+                x: -1.0,
+                y: -1.0,
+                z: -1.0
+            },
+            a - b
+        );
+        assert_eq!(
+            Vector3 {
+                x: -1.0,
+                y: -1.0,
+                z: -1.0
+            },
+            &a - &b
+        );
+        assert_eq!(
+            Vector3 {
+                x: -1.0,
+                y: -1.0,
+                z: -1.0
+            },
+            &a - b
+        );
+        assert_eq!(
+            Vector3 {
+                x: -1.0,
+                y: -1.0,
+                z: -1.0
+            },
+            a - &b
+        );
+        a -= b;
+        a -= &b;
+        assert_eq!(
+            Vector3 {
+                x: -3.0,
+                y: -3.0,
+                z: -3.0
+            },
+            a
+        );
+        a = Vector3::new(1.0, 1.0, 1.0);
+
+        // Multiplication
+        assert_eq!(
+            Vector3 {
+                x: 2.0,
+                y: 2.0,
+                z: 2.0
+            },
+            a * b
+        );
+        a *= b;
+        a *= &b;
+        assert_eq!(
+            Vector3 {
+                x: 4.0,
+                y: 4.0,
+                z: 4.0
+            },
+            a
+        );
+        a = Vector3::new(1.0, 1.0, 1.0);
+
+        // Division
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            a / b
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            &a / &b
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            &a / b
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            a / &b
+        );
+        a /= b;
+        a /= &b;
+        assert_eq!(
+            Vector3 {
+                x: 0.25,
+                y: 0.25,
+                z: 0.25
+            },
+            a
         );
     }
 }

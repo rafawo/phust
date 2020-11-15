@@ -399,3 +399,19 @@ fn vector_operators() {
         a
     );
 }
+
+#[test]
+fn product() {
+    let a = Vector3::<f64>::new(1.0, 2.0, 3.0);
+    let b = Vector3::<f64>::new(3.0, 2.0, 1.0);
+    assert_eq!(3.0 + 4.0 + 3.0, a.dot_product(&b));
+    assert_eq!(0.7751933733103613, a.theta(&b));
+    assert_eq!(
+        Vector3 {
+            x: -4.0,
+            y: 8.0,
+            z: -4.0
+        },
+        a.cross_product(&b)
+    );
+}

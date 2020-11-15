@@ -281,7 +281,7 @@ impl<F: num_traits::Float> Vector3<F> {
     /// used to represent the direction that is at right angles to both vectors.
     pub fn cross_product(&self, other: &Vector3<F>) -> Vector3<F> {
         let mut copy = *self;
-        copy.inplace_vector_product(other);
+        copy.inplace_cross_product(other);
         copy
     }
 
@@ -293,7 +293,7 @@ impl<F: num_traits::Float> Vector3<F> {
     /// # Remarks
     /// This function follows the Builder pattern, so it can be chained to other
     /// methods that modify the vector.
-    pub fn inplace_vector_product(&mut self, other: &Vector3<F>) -> &mut Vector3<F> {
+    pub fn inplace_cross_product(&mut self, other: &Vector3<F>) -> &mut Vector3<F> {
         let (x, y, z) = (self.x, self.y, self.z);
         self.x = (y * other.z) - (z * other.y);
         self.y = (z * other.x) - (x * other.z);

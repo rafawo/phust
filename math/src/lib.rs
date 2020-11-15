@@ -138,7 +138,98 @@ impl<F: num_traits::Float> Vector3<F> {
         self.z = self.z / scalar;
         self
     }
+
+    /// Adds the vector to another one.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn vector_add(&mut self, other: &Vector3<F>) -> &mut Self {
+        self.x = self.x + other.x;
+        self.y = self.y + other.y;
+        self.z = self.z + other.z;
+        self
+    }
+
+    /// Substracts the vector to another one.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn vector_sub(&mut self, other: &Vector3<F>) -> &mut Self {
+        self.x = self.x - other.x;
+        self.y = self.y - other.y;
+        self.z = self.z - other.z;
+        self
+    }
+
+    /// Multiplies the vector to another one.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn vector_mul(&mut self, other: &Vector3<F>) -> &mut Self {
+        self.x = self.x * other.x;
+        self.y = self.y * other.y;
+        self.z = self.z * other.z;
+        self
+    }
+
+    /// Divides the vector to another one.
+    ///
+    /// # Remarks
+    /// This function follows the Builder pattern, so it can be chained to other
+    /// methods that modify the vector.
+    pub fn vector_div(&mut self, other: &Vector3<F>) -> &mut Self {
+        self.x = self.x / other.x;
+        self.y = self.y / other.y;
+        self.z = self.z / other.z;
+        self
+    }
 }
+
+use std::ops::{Add, Div, Mul, Sub};
+
+macro_rules! impl_vec3_operator {
+    ($trait:ident, $fn_name:ident, $scalar_method:ident, $vector_method:ident) => {
+        impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<F> for &Vector3<F> {
+            type Output = Vector3<F>;
+            fn $fn_name(self, other: F) -> Vector3<F> {
+                let mut copy = *self;
+                *copy.$scalar_method(other)
+            }
+        }
+
+        impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<F> for Vector3<F> {
+            type Output = Vector3<F>;
+            fn $fn_name(self, other: F) -> Vector3<F> {
+                let mut copy = self;
+                *copy.$scalar_method(other)
+            }
+        }
+
+        impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<&Vector3<F>> for &Vector3<F> {
+            type Output = Vector3<F>;
+            fn $fn_name(self, other: &Vector3<F>) -> Vector3<F> {
+                let mut copy = *self;
+                *copy.$vector_method(other)
+            }
+        }
+
+        impl<F: $trait<Output = F> + num_traits::Float + Copy> $trait<&Vector3<F>> for Vector3<F> {
+            type Output = Vector3<F>;
+            fn $fn_name(self, other: &Vector3<F>) -> Vector3<F> {
+                let mut copy = self;
+                *copy.$vector_method(other)
+            }
+        }
+    };
+}
+
+impl_vec3_operator!(Add, add, scalar_add, vector_add);
+impl_vec3_operator!(Sub, sub, scalar_sub, vector_sub);
+impl_vec3_operator!(Mul, mul, scalar_mul, vector_mul);
+impl_vec3_operator!(Div, div, scalar_div, vector_div);
 
 #[cfg(test)]
 mod vector3_test {
@@ -220,11 +311,27 @@ mod vector3_test {
         );
         assert_eq!(
             Vector3 {
+                x: 4.5,
+                y: 4.5,
+                z: 4.5
+            },
+            vec3 + 1.5_f64
+        );
+        assert_eq!(
+            Vector3 {
                 x: 1.5,
                 y: 1.5,
                 z: 1.5
             },
             *vec3.scalar_sub(1.5)
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            vec3 - 1.0
         );
         assert_eq!(
             Vector3 {
@@ -236,11 +343,27 @@ mod vector3_test {
         );
         assert_eq!(
             Vector3 {
+                x: 6.0,
+                y: 6.0,
+                z: 6.0
+            },
+            vec3 * 2.0
+        );
+        assert_eq!(
+            Vector3 {
                 x: 1.0,
                 y: 1.0,
                 z: 1.0
             },
             *vec3.scalar_div(3.0)
+        );
+        assert_eq!(
+            Vector3 {
+                x: 0.5,
+                y: 0.5,
+                z: 0.5
+            },
+            vec3 / 2.0
         );
     }
 
